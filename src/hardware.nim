@@ -1,11 +1,17 @@
 import ./internalmacros
 
+const max8 {.used.} = 255'u8
+const max16 {.used.} = 65535'u16
+const max32 {.used.} = 4294967295'u32
+
 type
   Instruction* = proc(cpu: Cpu)
 
   Cpu* = ref object
     insts*: array[256, Instruction]
     register*: Registers
+    sRegister*: SegmentRegisters
+    cRegister*: ControlRegisters
     memory*: array[1073741824, uint8]
     eflags*: uint32
     eip*: uint32
@@ -13,6 +19,12 @@ type
 
   Registers* = ref object
     EAX*, ECX*, EDX*, EBX*, ESP*, EBP*, ESI*, EDI*: uint32
+
+  SegmentRegisters* = ref object
+    CS*, DS*, SS* ,ES*, FS*, GS*: uint16
+
+  ControlRegisters* = ref object
+    CR0*, CR2*, CR3*, CR4: uint32
 
   ModRm* = ref object
     `mod`*: uint8
@@ -99,7 +111,7 @@ proc get32*(cpu: Cpu, offset: uint32): int32 =
     result = result or (cast[int32](cpu.memory[start + idx]) shl (8 * idx))
 
 proc getRu32*(cpu: Cpu, index: uint8): uint32 =
-  result = case index:
+  result = case index
     of 0: cpu.register.EAX
     of 1: cpu.register.ECX
     of 2: cpu.register.EDX
@@ -111,11 +123,53 @@ proc getRu32*(cpu: Cpu, index: uint8): uint32 =
     else:
       raise newException(ValueError, "unknown register id")
 
+proc getSr*(cpu: Cpu, index: uint8): uint16 =
+  result = case index
+    of 0: cpu.sRegister.ES
+    of 1: cpu.sRegister.CS
+    of 2: cpu.sRegister.SS
+    of 3: cpu.sRegister.DS
+    of 4: cpu.sRegister.FS
+    of 5: cpu.sRegister.GS
+    else:
+      raise newException(ValueError, "unknown register id")
+
+proc setSr*(cpu: Cpu, index: uint8, val: uint16) =
+  case index
+    of 0: cpu.sRegister.ES = val
+    of 1: cpu.sRegister.CS = val
+    of 2: cpu.sRegister.SS = val
+    of 3: cpu.sRegister.DS = val
+    of 4: cpu.sRegister.FS = val
+    of 5: cpu.sRegister.GS = val
+    else:
+      raise newException(ValueError, "unknown register id")
+
+proc getCr*(cpu: Cpu, index: uint8): uint32 =
+  result = case index
+    of 0: cpu.cRegister.CR0
+    # of 1: cpu.cRegister.CR1 unused
+    of 2: cpu.cRegister.CR2
+    of 3: cpu.cRegister.CR3
+    of 4: cpu.cRegister.CR4
+    else:
+      raise newException(ValueError, "unknown register id")
+
+proc setCr*(cpu: Cpu, index: uint8, val: uint32) =
+  case index
+    of 0: cpu.cRegister.CR0 = val
+    # of 1: cpu.cRegister.CR1 unused
+    of 2: cpu.cRegister.CR2 = val
+    of 3: cpu.cRegister.CR3 = val
+    of 4: cpu.cRegister.CR4 = val
+    else:
+      raise newException(ValueError, "unknown register id")
+
 proc getR32*(cpu: Cpu, index: uint8): int32 {.inline.} =
   cast[int32](cpu.getRu32(index))
 
 proc setR32*(cpu: Cpu, index: uint8, val: uint32) =
-  case index:
+  case index
     of 0:
       cpu.register.EAX = val
     of 1:
@@ -135,7 +189,7 @@ proc setR32*(cpu: Cpu, index: uint8, val: uint32) =
     else:
       raise newException(ValueError, "unknown register id")
 
-proc setR16*(cpu: Cpu, index: uint8): uint16 =
+proc getR16*(cpu: Cpu, index: uint8): uint16 =
   result = case index
     of 0: cpu.register.getAX
     of 1: cpu.register.getCX
@@ -148,7 +202,7 @@ proc setR16*(cpu: Cpu, index: uint8): uint16 =
     else:
       raise newException(ValueError, "unknown register id")
 
-proc setR16*(cpu: Cpu, index: uint8, val: uint16): uint16 =
+proc setR16*(cpu: Cpu, index: uint8, val: uint16) =
   case index
     of 0: cpu.register.setAX(val)
     of 1: cpu.register.setCX(val)
@@ -162,7 +216,7 @@ proc setR16*(cpu: Cpu, index: uint8, val: uint16): uint16 =
       raise newException(ValueError, "unknown register id")
 
 proc getR8*(cpu: Cpu, index: uint8): uint8 =
-  result = case index:
+  result = case index
     of 0: cpu.register.getAL
     of 1: cpu.register.getCL
     of 2: cpu.register.getDL
@@ -175,7 +229,7 @@ proc getR8*(cpu: Cpu, index: uint8): uint8 =
       raise newException(ValueError, "unknown register id")
 
 proc setR8*(cpu: Cpu, index: uint8, val: uint8) =
-  case index:
+  case index
     of 0: cpu.register.setAL(val)
     of 1: cpu.register.setCL(val)
     of 2: cpu.register.setDL(val)
@@ -228,6 +282,11 @@ proc memoryAddress*(cpu: Cpu, rm: ModRm): uint32 =
 proc setM8*(cpu: Cpu, address: uint32, val: uint8) =
   cpu.memory[address] = val
 
+proc setM16*(cpu: Cpu, address: uint32, val: uint16) =
+  let split = cast[array[2, uint8]](val)
+  cpu.setM8(address, split[0])
+  cpu.setM8(address + 1, split[1])
+
 proc setM32*(cpu: Cpu, address: uint32, val: uint32) =
   let split = cast[array[4, uint8]](val)
   for index in 0'u32..3'u32:
@@ -236,6 +295,9 @@ proc setM32*(cpu: Cpu, address: uint32, val: uint32) =
 proc getMu8*(cpu: Cpu, address: uint32): uint8 =
   cpu.memory[address]
 
+proc getMu16*(cpu: Cpu, address: uint32): uint16 =
+  cast[uint16](cpu.memory[address]) or (cast[uint16](cpu.memory[address + 1]) shl 8)
+
 proc getMu32*(cpu: Cpu, address: uint32): uint32 =
   result = 0
   for idx in 0'u32..3:
@@ -243,6 +305,9 @@ proc getMu32*(cpu: Cpu, address: uint32): uint32 =
 
 proc getM8*(cpu: Cpu, address: uint32): int8 =
   cast[int8](cpu.memory[address])
+
+proc getM16*(cpu: Cpu, address: uint32): int16 =
+  cast[int16](cpu.memory[address]) or (cast[int16](cpu.memory[address + 1]) shl 8)
 
 proc getM32*(cpu: Cpu, address: uint32): int32 =
   result = 0
@@ -278,10 +343,48 @@ proc setR32*(cpu: Cpu, rm: ModRm, val: uint32) =
 proc setR8*(cpu: Cpu, rm: ModRm, val: uint8) =
   cpu.setR8(rm.reg, val)
 
+proc getRm16*(cpu: Cpu, rm: ModRm): uint16 =
+  if rm.mod == 3:
+    return cpu.getR16(rm.rm)
+  return cpu.getMu16(cpu.memoryAddress(rm))
+
+proc setRm16*(cpu: Cpu, rm: ModRm, val: uint16) =
+  if rm.mod == 3:
+    cpu.setR16(rm.rm, val)
+  else:
+    let address = cpu.memoryAddress(rm)
+    cpu.setM16(address, val)
+
 proc getRm8*(cpu: Cpu, rm: ModRm): uint8 =
   if rm.mod == 3:
     return cpu.getR8(rm.rm)
   return cpu.getMu8(cpu.memoryAddress(rm))
+
+proc setRm8*(cpu: Cpu, rm: ModRm, val: uint8) =
+  if rm.mod == 3:
+    cpu.setR8(rm.rm, val)
+  else:
+    cpu.setM8(cpu.memoryAddress(rm), val)
+
+proc updateFlagsAfterAdd*(cpu: Cpu, op1, op2: uint8, res: uint8) =
+  let sign1 = op1 shr 7
+  let sign2 = op2 shr 7
+  let signR = res shr 7
+  cpu.setCarry(op1 > max8 - op2)
+  cpu.setZero(res == 0)
+  cpu.setSign(signR == 1)
+  cpu.setParity((res and 1) == 0)
+  cpu.setOverflow(sign1 != sign2 and sign1 != signR)
+
+proc updateFlagsAfterAdd*(cpu: Cpu, op1, op2: uint32, res: uint32) =
+  let sign1 = op1 shr 31
+  let sign2 = op2 shr 31
+  let signR = res shr 31
+  cpu.setCarry(op1 > max32 - op2)
+  cpu.setZero(res == 0)
+  cpu.setSign(signR == 1)
+  cpu.setParity((res and 1) == 0)
+  cpu.setOverflow(sign1 != sign2 and sign1 != signR)
 
 proc updateFlagsAfterSubtract*(cpu: Cpu, op1, op2: uint32, res: uint32) =
   let sign1 = op1 shr 31
@@ -290,6 +393,7 @@ proc updateFlagsAfterSubtract*(cpu: Cpu, op1, op2: uint32, res: uint32) =
   cpu.setCarry(op1 < op2)
   cpu.setZero(res == 0)
   cpu.setSign(signR == 1)
+  cpu.setParity((res and 1) == 0)
   cpu.setOverflow(sign1 != sign2 and sign1 != signR)
 
 proc push32*(cpu: Cpu, val: uint32) =

@@ -51,3 +51,33 @@ proc movR8Rm8*(cpu: Cpu) =
   let rm = cpu.modRm()
   let rm8 = cpu.getRm8(rm)
   cpu.setR8(rm, rm8)
+
+proc movSr16Rm16*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  cpu.setSr(rm.reg, cpu.getRm16(rm))
+
+proc movRm16Sr16*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  cpu.setRm16(rm, cpu.getSr(rm.reg))
+
+proc movCr32Rm32*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  cpu.setCr(rm.reg, cpu.getRmu32(rm))
+
+proc movRm32Cr32*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  cpu.setRm32(rm, cpu.getCr(rm.reg))
+
+proc op0fh*(cpu: Cpu) =
+  cpu.eip += 1
+  case cpu.getU8(0)
+  of 0x22:
+    cpu.movCr32Rm32()
+  of 0x20:
+    cpu.movRm32Cr32()
+  else:
+    raise newException(ValueError, "unknown operator")

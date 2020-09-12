@@ -1,11 +1,111 @@
 import ../hardware
+template carry8(cpu: Cpu): uint8 = (if cpu.isCarry: 1 else: 0)
+# template carry16(cpu: Cpu): uint16 = (if cpu.isCarry: 1 else: 0)
+template carry32(cpu: Cpu): uint32 = (if cpu.isCarry: 1 else: 0)
+
+proc addRm8R8*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r8 = cpu.getR8(rm.reg)
+  let rm8 = cpu.getRm8(rm)
+  let res = r8 + rm8
+  cpu.setRm8(rm, res)
+  cpu.updateFlagsAfterAdd(r8, rm8, res)
 
 proc addRm32R32*(cpu: Cpu) =
   cpu.eip += 1
   let rm = cpu.modRm()
   let r32 = cpu.getRu32(rm)
   let rm32 = cpu.getRmu32(rm)
-  cpu.setRm32(rm, r32 + rm32)
+  let res = r32 + rm32
+  cpu.setRm32(rm, res)
+  cpu.updateFlagsAfterAdd(r32, rm32, res)
+
+proc addR32Rm32*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r32 = cpu.getRu32(rm)
+  let rm32 = cpu.getRmu32(rm)
+  let res = r32 + rm32
+  cpu.setR32(rm.reg, res)
+  cpu.updateFlagsAfterAdd(r32, rm32, res)
+
+proc addR8Rm8*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r8 = cpu.getR8(rm.reg)
+  let rm8 = cpu.getRm8(rm)
+  let res = r8 + rm8
+  cpu.setR8(rm.reg, res)
+  cpu.updateFlagsAfterAdd(r8, rm8, res)
+
+proc addAlImm8*(cpu: Cpu) =
+  let imm8 = cpu.getU8(1)
+  let r8 = cpu.register.getAL
+  let res = r8 + imm8
+  cpu.register.setAL(res)
+  cpu.updateFlagsAfterAdd(r8, imm8, res)
+  cpu.eip += 2
+
+proc addEaxImm32*(cpu: Cpu) =
+  let imm32 = cpu.getU32(1)
+  let eax = cpu.register.EAX
+  let res = imm32 + eax
+  cpu.register.EAX = res
+  cpu.updateFlagsAfterAdd(eax, imm32, res)
+  cpu.eip += 2
+
+proc adcRm8R8*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r8 = cpu.getR8(rm.reg) + cpu.carry8
+  let rm8 = cpu.getRm8(rm)
+  let res = r8 + rm8
+  cpu.setRm8(rm, res)
+  cpu.updateFlagsAfterAdd(r8, rm8, res)
+
+proc adcRm32R32*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r32 = cpu.getRu32(rm) + cpu.carry32
+  let rm32 = cpu.getRmu32(rm)
+  let res = r32 + rm32
+  cpu.setRm32(rm, res)
+  cpu.updateFlagsAfterAdd(r32, rm32, res)
+
+proc adcR32Rm32*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r32 = cpu.getRu32(rm) + cpu.carry32
+  let rm32 = cpu.getRmu32(rm)
+  let res = r32 + rm32
+  cpu.setR32(rm.reg, res)
+  cpu.updateFlagsAfterAdd(r32, rm32, res)
+
+proc adcR8Rm8*(cpu: Cpu) =
+  cpu.eip += 1
+  let rm = cpu.modRm()
+  let r8 = cpu.getR8(rm.reg) + cpu.carry8
+  let rm8 = cpu.getRm8(rm)
+  let res = r8 + rm8
+  cpu.setR8(rm.reg, res)
+  cpu.updateFlagsAfterAdd(r8, rm8, res)
+
+proc adcAlImm8*(cpu: Cpu) =
+  let imm8 = cpu.getU8(1) + cpu.carry8
+  let al = cpu.register.getAL
+  let res = al + imm8
+  cpu.register.setAL(res)
+  cpu.updateFlagsAfterAdd(al, imm8, res)
+  cpu.eip += 2
+
+proc adcEaxImm32*(cpu: Cpu) =
+  let imm32 = cpu.getU32(1) + cpu.carry32
+  let eax = cpu.register.EAX
+  let res = imm32 + eax
+  cpu.register.EAX = res
+  cpu.updateFlagsAfterAdd(eax, imm32, res)
+  cpu.eip += 2
 
 proc subRm32Imm8(cpu: Cpu, rm: ModRm) =
   let rm32 = cpu.getRmu32(rm)

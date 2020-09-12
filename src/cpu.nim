@@ -5,12 +5,28 @@ import ./bios
 
 export hardware
 
+template ip(cpu: Cpu): uint32 = cpu.sRegister.CS + cpu.eip
+
 proc newCpu*(bareMode: bool = false): Cpu =
   new result
   new result.register
+  new result.sRegister
+  new result.cRegister
   result.bareMode = bareMode
 
+  result.insts[0x00] = addRm8R8
   result.insts[0x01] = addRm32R32
+  result.insts[0x02] = addR8Rm8
+  result.insts[0x03] = addR32Rm32
+  result.insts[0x04] = addAlImm8
+  result.insts[0x05] = addEaxImm32
+  result.insts[0x10] = adcRm8R8
+  result.insts[0x11] = adcRm32R32
+  result.insts[0x12] = adcR8Rm8
+  result.insts[0x13] = adcR32Rm32
+  result.insts[0x14] = adcAlImm8
+  result.insts[0x15] = adcEaxImm32
+  result.insts[0x0f] = op0fh
   result.insts[0x3b] = cmpR32Rm32
   result.insts[0x3c] = cmpAlImm8
   for idx in 0..8:
@@ -35,6 +51,8 @@ proc newCpu*(bareMode: bool = false): Cpu =
   result.insts[0x89] = movRm32R32
   result.insts[0x8a] = movR8Rm8
   result.insts[0x8b] = movR32Rm32
+  result.insts[0x8c] = movRm16Sr16
+  result.insts[0x8e] = movSr16Rm16
   result.insts[0x90] = nop
   result.insts[0x9e] = sahf
   result.insts[0x9f] = lahf

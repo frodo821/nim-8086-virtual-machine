@@ -1,11 +1,10 @@
 import strutils
+import ./bios
 import ./hardware
 import ./instructions
-import ./bios
+import ./internalmacros
 
 export hardware
-
-template ip(cpu: Cpu): uint32 = cpu.sRegister.CS + cpu.eip
 
 proc newCpu*(bareMode: bool = false): Cpu =
   new result
@@ -14,8 +13,7 @@ proc newCpu*(bareMode: bool = false): Cpu =
   new result.cRegister
   result.bareMode = bareMode
 
-  result.insts[0x00] = addRm8R8
-  result.insts[0x01] = addRm32R32
+  loadAllInsts result
   result.insts[0x02] = addR8Rm8
   result.insts[0x03] = addR32Rm32
   result.insts[0x04] = addAlImm8

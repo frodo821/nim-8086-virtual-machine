@@ -11,7 +11,7 @@ proc popR32*(cpu: Cpu) =
   cpu.eip += 1
 
 proc pushImm8*(cpu: Cpu) =
-  cpu.push32(cpu.getU8(1))
+  cpu.push8(cpu.getU8(1))
   cpu.eip += 2
 
 proc pushImm32*(cpu: Cpu) =

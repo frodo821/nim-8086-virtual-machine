@@ -69,3 +69,25 @@ macro flag*(name: untyped, flag: uint32): untyped =
         cpu.eflags = cpu.eflags and (not `flag`)
 
     proc `getter`*(cpu: Cpu): bool {.inline.} = (cpu.eflags and `flag`) != 0
+
+var insts {.compileTime.}: seq[NimNode] = newSeq[NimNode]()
+
+macro inst*(name: untyped, opcode: uint8, body: untyped): untyped =
+  let cpu = newIdentNode("cpu")
+
+  insts.add(
+    quote do:
+      `cpu`.insts[`opcode`] = `name`
+  )
+
+  result = quote do:
+    proc `name`*(`cpu`: Cpu) =
+      `body`
+
+macro loadAllInsts*(ident: untyped): untyped =
+  let cpu = newIdentNode("cpu")
+  let instsStmt = newStmtList(insts)
+
+  result = quote do:
+    let `cpu` {.used.} = `ident`
+    `instsStmt`

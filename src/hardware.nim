@@ -406,6 +406,16 @@ proc pop32*(cpu: Cpu): uint32 =
   result = cpu.getMu32(esp)
   cpu.register.ESP = esp + 4
 
+proc push8*(cpu: Cpu, val: uint8) =
+  let esp = cpu.register.ESP - 1
+  cpu.register.ESP = esp
+  cpu.setM8(esp, val)
+
+proc pop8*(cpu: Cpu): uint8 =
+  let esp = cpu.register.ESP
+  result = cpu.getMu8(esp)
+  cpu.register.ESP = esp + 1
+
 proc readIo8*(cpu: Cpu, port: uint16): uint8 =
   if port == 0x03f8:
     return cast[uint8](stdin.readChar())

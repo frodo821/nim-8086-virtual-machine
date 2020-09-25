@@ -1,9 +1,10 @@
 import ../hardware
+import ../internalmacros
 template carry8(cpu: Cpu): uint8 = (if cpu.isCarry: 1 else: 0)
 # template carry16(cpu: Cpu): uint16 = (if cpu.isCarry: 1 else: 0)
 template carry32(cpu: Cpu): uint32 = (if cpu.isCarry: 1 else: 0)
 
-proc addRm8R8*(cpu: Cpu) =
+inst addRm8R8, 0x00:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r8 = cpu.getR8(rm.reg)
@@ -12,7 +13,7 @@ proc addRm8R8*(cpu: Cpu) =
   cpu.setRm8(rm, res)
   cpu.updateFlagsAfterAdd(r8, rm8, res)
 
-proc addRm32R32*(cpu: Cpu) =
+inst addRm32R32, 0x01:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r32 = cpu.getRu32(rm)

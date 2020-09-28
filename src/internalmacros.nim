@@ -1,23 +1,5 @@
 import macros, strutils
 
-macro jumpIf*(name: untyped, cond: untyped): untyped =
-  let ident = newIdentNode("cpu")
-  result = quote do:
-    proc `name`*(`ident`: Cpu) {.inject.} =
-      if (`cond`):
-        cpu.jmps()
-      else:
-        cpu.eip += 2
-
-macro jumpIfNot*(name: untyped, cond: untyped): untyped =
-  let ident = newIdentNode("cpu")
-  result = quote do:
-    proc `name`*(`ident`: Cpu) {.inject.} =
-      if not (`cond`):
-        cpu.jmps()
-      else:
-        cpu.eip += 2
-
 macro registerOp16*(name: untyped): untyped =
   let getter = newIdentNode("get" & repr(name))
   let setter = newIdentNode("set" & repr(name))
@@ -83,6 +65,22 @@ macro inst*(name: untyped, opcode: uint8, body: untyped): untyped =
   result = quote do:
     proc `name`*(`cpu`: Cpu) =
       `body`
+
+macro jumpInst*(name: untyped, opcode: uint8, cond: untyped): untyped =
+  result = quote do:
+    inst `name`, `opcode`:
+      if (`cond`):
+        cpu.jmps()
+      else:
+        cpu.eip += 2
+
+macro jumpNotInst*(name: untyped, opcode: uint8, cond: untyped): untyped =
+  result = quote do:
+    inst `name`, `opcode`:
+      if not (`cond`):
+        cpu.jmps()
+      else:
+        cpu.eip += 2
 
 macro loadAllInsts*(ident: untyped): untyped =
   let cpu = newIdentNode("cpu")

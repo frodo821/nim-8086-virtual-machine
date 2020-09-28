@@ -14,10 +14,6 @@ proc newCpu*(bareMode: bool = false): Cpu =
   result.bareMode = bareMode
 
   loadAllInsts result
-  result.insts[0x02] = addR8Rm8
-  result.insts[0x03] = addR32Rm32
-  result.insts[0x04] = addAlImm8
-  result.insts[0x05] = addEaxImm32
   result.insts[0x10] = adcRm8R8
   result.insts[0x11] = adcRm32R32
   result.insts[0x12] = adcR8Rm8
@@ -33,18 +29,6 @@ proc newCpu*(bareMode: bool = false): Cpu =
     result.insts[0x50 + idx] = pushR32
   for idx in 0..8:
     result.insts[0x58 + idx] = popR32
-  result.insts[0x68] = pushImm32
-  result.insts[0x6a] = pushImm8
-  result.insts[0x70] = jo
-  result.insts[0x71] = jno
-  result.insts[0x72] = jc
-  result.insts[0x73] = jnc
-  result.insts[0x74] = jz
-  result.insts[0x75] = jnz
-  result.insts[0x78] = js
-  result.insts[0x79] = jns
-  result.insts[0x7c] = jl
-  result.insts[0x7e] = jle
   result.insts[0x83] = op83h
   result.insts[0x89] = movRm32R32
   result.insts[0x8a] = movR8Rm8
@@ -62,10 +46,7 @@ proc newCpu*(bareMode: bool = false): Cpu =
   result.insts[0xc7] = movRm32Imm32
   result.insts[0xc9] = leave
   result.insts[0xcd] = interrupt
-  result.insts[0xe3] = jcxz
   result.insts[0xe8] = callRelative32
-  result.insts[0xe9] = jmpn
-  result.insts[0xeb] = jmps
   result.insts[0xec] = inAlDx
   result.insts[0xee] = outDxAl
   result.insts[0xf4] = hlt

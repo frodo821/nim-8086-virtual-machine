@@ -22,7 +22,7 @@ inst addRm32R32, 0x01:
   cpu.setRm32(rm, res)
   cpu.updateFlagsAfterAdd(r32, rm32, res)
 
-proc addR32Rm32*(cpu: Cpu) =
+inst addR32Rm32, 0x03:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r32 = cpu.getRu32(rm)
@@ -31,7 +31,7 @@ proc addR32Rm32*(cpu: Cpu) =
   cpu.setR32(rm.reg, res)
   cpu.updateFlagsAfterAdd(r32, rm32, res)
 
-proc addR8Rm8*(cpu: Cpu) =
+inst addR8Rm8, 0x02:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r8 = cpu.getR8(rm.reg)
@@ -40,7 +40,7 @@ proc addR8Rm8*(cpu: Cpu) =
   cpu.setR8(rm.reg, res)
   cpu.updateFlagsAfterAdd(r8, rm8, res)
 
-proc addAlImm8*(cpu: Cpu) =
+inst addAlImm8, 0x04:
   let imm8 = cpu.getU8(1)
   let r8 = cpu.register.getAL
   let res = r8 + imm8
@@ -48,7 +48,7 @@ proc addAlImm8*(cpu: Cpu) =
   cpu.updateFlagsAfterAdd(r8, imm8, res)
   cpu.eip += 2
 
-proc addEaxImm32*(cpu: Cpu) =
+inst addEaxImm32, 0x05:
   let imm32 = cpu.getU32(1)
   let eax = cpu.register.EAX
   let res = imm32 + eax

@@ -1,5 +1,5 @@
 import ../hardware
-import ../internalmacros
+import ./instmacros
 
 proc pushR32*(cpu: Cpu) =
   let reg = cpu.getU8(0) - 0x50

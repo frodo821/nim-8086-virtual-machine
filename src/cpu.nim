@@ -2,7 +2,6 @@ import strutils
 import ./bios
 import ./hardware
 import ./instructions
-import ./internalmacros
 
 export hardware
 

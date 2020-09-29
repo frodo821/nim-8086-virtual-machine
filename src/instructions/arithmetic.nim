@@ -1,5 +1,5 @@
 import ../hardware
-import ../internalmacros
+import ./instmacros
 template carry8(cpu: Cpu): uint8 = (if cpu.isCarry: 1 else: 0)
 # template carry16(cpu: Cpu): uint16 = (if cpu.isCarry: 1 else: 0)
 template carry32(cpu: Cpu): uint32 = (if cpu.isCarry: 1 else: 0)

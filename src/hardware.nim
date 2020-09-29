@@ -35,7 +35,8 @@ type
     disp8*: int8
     disp32*: int32
 
-  CpuFlagsInternalType* = distinct int8
+  UnsafeExternalUseOfInternalCpuFlagsType* = distinct int8
+  CpuFlagsInternal = UnsafeExternalUseOfInternalCpuFlagsType
 
 registerOp16(AX)
 registerOp16(CX)
@@ -50,24 +51,24 @@ registerOp8(C)
 registerOp8(D)
 registerOp8(B)
 
-const CpuFlags* = CpuFlagsInternalType(0)
+const CpuFlags* = CpuFlagsInternal(0)
 
-proc CarryFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32
-proc ParityFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 2
-proc AdjustFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 4
-proc ZeroFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 6
-proc SignFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 7
-proc TrapFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 8
-proc InterruptFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 9
-proc DirectionFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 10
-proc OverflowFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 11
-proc IOPL*(flags: CpuFlagsInternalType): uint32 {.inline.} = (1'u32 shl 12) or (1'u32 shl 13)
-proc NestTaskFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 14
-proc ResumeFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 16
-proc VirtualMode*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 17
-proc AlignmentCheck*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 18
-proc VirtualInterruptFlag*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 19
-proc VirtualInterruptPending*(flags: CpuFlagsInternalType): uint32 {.inline.} = 1'u32 shl 20
+proc CarryFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32
+proc ParityFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 2
+proc AdjustFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 4
+proc ZeroFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 6
+proc SignFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 7
+proc TrapFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 8
+proc InterruptFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 9
+proc DirectionFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 10
+proc OverflowFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 11
+proc IOPL*(flags: CpuFlagsInternal): uint32 {.inline.} = (1'u32 shl 12) or (1'u32 shl 13)
+proc NestTaskFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 14
+proc ResumeFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 16
+proc VirtualMode*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 17
+proc AlignmentCheck*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 18
+proc VirtualInterruptFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 19
+proc VirtualInterruptPending*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 20
 
 flag carry:
   CpuFlags.CarryFlag

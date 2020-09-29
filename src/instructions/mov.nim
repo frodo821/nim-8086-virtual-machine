@@ -1,4 +1,5 @@
 import ../hardware
+import ./instmacros
 
 proc movR32Imm32*(cpu: Cpu) =
   let reg = cpu.getU8(0) - 0xb8
@@ -72,7 +73,7 @@ proc movRm32Cr32*(cpu: Cpu) =
   let rm = cpu.modRm()
   cpu.setRm32(rm, cpu.getCr(rm.reg))
 
-proc op0fh*(cpu: Cpu) =
+inst op0fh, 0x0f:
   cpu.eip += 1
   case cpu.getU8(0)
   of 0x22:

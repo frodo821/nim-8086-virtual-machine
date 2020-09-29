@@ -13,22 +13,7 @@ proc newCpu*(bareMode: bool = false): Cpu =
   result.bareMode = bareMode
 
   loadAllInsts result
-  result.insts[0x10] = adcRm8R8
-  result.insts[0x11] = adcRm32R32
-  result.insts[0x12] = adcR8Rm8
-  result.insts[0x13] = adcR32Rm32
-  result.insts[0x14] = adcAlImm8
-  result.insts[0x15] = adcEaxImm32
-  result.insts[0x0f] = op0fh
-  result.insts[0x3b] = cmpR32Rm32
-  result.insts[0x3c] = cmpAlImm8
-  for idx in 0..8:
-    result.insts[0x40 + idx] = incR32
-  for idx in 0..8:
-    result.insts[0x50 + idx] = pushR32
-  for idx in 0..8:
-    result.insts[0x58 + idx] = popR32
-  result.insts[0x83] = op83h
+
   result.insts[0x89] = movRm32R32
   result.insts[0x8a] = movR8Rm8
   result.insts[0x8b] = movR32Rm32
@@ -56,9 +41,13 @@ proc newCpu*(bareMode: bool = false): Cpu =
   result.insts[0xfb] = sti
   result.insts[0xfc] = cld
   result.insts[0xfd] = std
-  result.insts[0xff] = opFFh
 
   result.initBios()
+
+proc `$`(inst: Instruction): string =
+  if inst.isNil:
+    return "nil"
+  return "inst"
 
 proc dumpCpuStat*(cpu: Cpu) =
   var pr = "Registers:\n"
@@ -83,8 +72,10 @@ proc dumpCpuStat*(cpu: Cpu) =
   pr &= "\nInstruction Counter: " & $cpu.eip & "\n"
   pr &= "Instruction: " & cpu.memory[cpu.eip].toHex() & "\n"
   echo pr
+  echo $cpu.insts
 
 proc run*(cpu: Cpu, start: uint32, program: seq[uint8]) =
+  cpu.dumpCpuStat()
   let ran = start..(start + cast[uint32](program.len) - 1)
 
   cpu.memory[ran] = program

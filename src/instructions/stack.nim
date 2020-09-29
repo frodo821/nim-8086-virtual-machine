@@ -1,12 +1,12 @@
 import ../hardware
 import ./instmacros
 
-proc pushR32*(cpu: Cpu) =
+instReg pushR32, 0x50, 8:
   let reg = cpu.getU8(0) - 0x50
   cpu.push32(cpu.getRu32(reg))
   cpu.eip += 1
 
-proc popR32*(cpu: Cpu) =
+instReg popR32, 0x58, 8:
   let reg = cpu.getU8(0) - 0x58
   cpu.setR32(reg, cpu.pop32())
   cpu.eip += 1

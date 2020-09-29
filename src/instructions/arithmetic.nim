@@ -56,7 +56,7 @@ inst addEaxImm32, 0x05:
   cpu.updateFlagsAfterAdd(eax, imm32, res)
   cpu.eip += 2
 
-proc adcRm8R8*(cpu: Cpu) =
+inst adcRm8R8, 0x10:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r8 = cpu.getR8(rm.reg) + cpu.carry8
@@ -65,7 +65,7 @@ proc adcRm8R8*(cpu: Cpu) =
   cpu.setRm8(rm, res)
   cpu.updateFlagsAfterAdd(r8, rm8, res)
 
-proc adcRm32R32*(cpu: Cpu) =
+inst adcRm32R32, 0x11:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r32 = cpu.getRu32(rm) + cpu.carry32
@@ -74,7 +74,7 @@ proc adcRm32R32*(cpu: Cpu) =
   cpu.setRm32(rm, res)
   cpu.updateFlagsAfterAdd(r32, rm32, res)
 
-proc adcR32Rm32*(cpu: Cpu) =
+inst adcR32Rm32, 0x13:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r32 = cpu.getRu32(rm) + cpu.carry32
@@ -83,7 +83,7 @@ proc adcR32Rm32*(cpu: Cpu) =
   cpu.setR32(rm.reg, res)
   cpu.updateFlagsAfterAdd(r32, rm32, res)
 
-proc adcR8Rm8*(cpu: Cpu) =
+inst adcR8Rm8, 0x12:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r8 = cpu.getR8(rm.reg) + cpu.carry8
@@ -92,7 +92,7 @@ proc adcR8Rm8*(cpu: Cpu) =
   cpu.setR8(rm.reg, res)
   cpu.updateFlagsAfterAdd(r8, rm8, res)
 
-proc adcAlImm8*(cpu: Cpu) =
+inst adcAlImm8, 0x14:
   let imm8 = cpu.getU8(1) + cpu.carry8
   let al = cpu.register.getAL
   let res = al + imm8
@@ -100,7 +100,7 @@ proc adcAlImm8*(cpu: Cpu) =
   cpu.updateFlagsAfterAdd(al, imm8, res)
   cpu.eip += 2
 
-proc adcEaxImm32*(cpu: Cpu) =
+inst adcEaxImm32, 0x15:
   let imm32 = cpu.getU32(1) + cpu.carry32
   let eax = cpu.register.EAX
   let res = imm32 + eax
@@ -128,7 +128,7 @@ proc cmpRm32Imm8*(cpu: Cpu, rm: ModRm) =
   cpu.eip += 1
   cpu.updateFlagsAfterSubtract(cast[uint32](rm32), cast[uint32](imm8), cast[uint32](rm32 - imm8))
 
-proc op83h*(cpu: Cpu) =
+inst op83h, 0x83:
   cpu.eip += 1
   let rm = cpu.modRm()
   case rm.opcode
@@ -141,15 +141,15 @@ proc op83h*(cpu: Cpu) =
   else:
     raise newException(ValueError, "unknown operator")
 
-proc incRm32*(cpu: Cpu, rm: ModRm) =
-  cpu.setRm32(rm, cpu.getRmu32(rm) + 1)
-
-proc incR32*(cpu: Cpu) =
+instReg incR32, 0x40, 8:
   let reg = cpu.getU8(0) - 0x40
   cpu.setR32(reg, cpu.getRu32(reg) + 1)
   cpu.eip += 1
 
-proc opFFh*(cpu: Cpu) =
+proc incRm32*(cpu: Cpu, rm: ModRm) =
+  cpu.setRm32(rm, cpu.getRmu32(rm) + 1)
+
+inst opFFh, 0xff:
   cpu.eip += 1
   let rm = cpu.modRm()
 
@@ -158,14 +158,14 @@ proc opFFh*(cpu: Cpu) =
   else:
     raise newException(ValueError, "unknown operator")
 
-proc cmpR32Rm32*(cpu: Cpu) =
+inst cmpR32Rm32, 0x3b:
   cpu.eip += 1
   let rm = cpu.modRm()
   let r32 = cpu.getRu32(rm)
   let rm32 = cpu.getRmu32(rm)
   cpu.updateFlagsAfterSubtract(r32, rm32, r32 - rm32)
 
-proc cmpAlImm8*(cpu: Cpu) =
+inst cmpAlImm8, 0x3c:
   let val = cpu.getU8(1)
   let al = cpu.register.getAL
   cpu.updateFlagsAfterSubtract(al, val, al - val)

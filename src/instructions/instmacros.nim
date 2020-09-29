@@ -14,6 +14,19 @@ macro inst*(name: untyped, opcode: uint8, body: untyped): untyped =
     proc `name`*(`cpu`: Cpu) =
       `body`
 
+macro instReg*(name: untyped, base: uint8, count: uint8, body: untyped): untyped =
+  let cpu = newIdentNode("cpu")
+
+  for opcode in base.intVal..(base.intVal + count.intVal - 1):
+    insts.add(
+      quote do:
+        `cpu`.insts[`opcode`] = `name`
+    )
+
+  result = quote do:
+    proc `name`*(`cpu`: Cpu) =
+      `body`
+
 macro jumpIf*(name: untyped, opcode: uint8, cond: untyped): untyped =
   result = quote do:
     inst `name`, `opcode`:

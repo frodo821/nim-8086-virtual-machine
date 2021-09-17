@@ -16,6 +16,7 @@ type
     eflags*: uint32
     eip*: uint32
     bareMode*: bool
+    halted*: bool
 
   Registers* = ref object
     EAX*, ECX*, EDX*, EBX*, ESP*, EBP*, ESI*, EDI*: uint32

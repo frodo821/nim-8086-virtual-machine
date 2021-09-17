@@ -1,4 +1,4 @@
-import strutils
+import strutils, os
 import ./bios
 import ./hardware
 import ./instructions
@@ -53,6 +53,9 @@ proc run*(cpu: Cpu, start: uint32, program: seq[uint8]) =
   cpu.memory[ran] = program
   cpu.eip = start
   while cast[int](cpu.eip) < cpu.memory.len and cpu.eip != 0:
+    if cpu.halted:
+      sleep(10)
+      continue
     let inst = cpu.memory[cpu.eip]
     cpu.insts[inst](cpu)
     #cpu.dumpCpuStat()

@@ -29,6 +29,7 @@ inst nop, 0x90:
   cpu.eip += 1
 
 inst hlt, 0xf4:
+  cpu.halted = true
   cpu.eip += 1
 
 inst interrupt, 0xcd:

@@ -14,11 +14,6 @@ proc newCpu*(bareMode: bool = false): Cpu =
 
   loadAllInsts result
 
-  for idx in 0..8:
-      result.insts[0xb0 + idx] = movR8Imm8
-  for idx in 0..8:
-      result.insts[0xb8 + idx] = movR32Imm32
-
   result.initBios()
 
 proc `$`(inst: Instruction): string =

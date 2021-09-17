@@ -47,11 +47,11 @@ proc dumpCpuStat*(cpu: Cpu) =
   echo $cpu.insts
 
 proc run*(cpu: Cpu, start: uint32, program: seq[uint8]) =
-  cpu.dumpCpuStat()
   let ran = start..(start + cast[uint32](program.len) - 1)
 
   cpu.memory[ran] = program
   cpu.eip = start
+
   while cast[int](cpu.eip) < cpu.memory.len and cpu.eip != 0:
     if cpu.halted:
       sleep(10)

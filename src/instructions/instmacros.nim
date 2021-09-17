@@ -14,6 +14,20 @@ macro inst*(name: untyped, opcode: uint8, body: untyped): untyped =
     proc `name`*(`cpu`: Cpu) =
       `body`
 
+macro variationInsts*(name: untyped, opcode: uint8, numbers: uint, body: untyped): untyped =
+  let cpu = newIdentNode("cpu")
+
+  for idx in 0..<numbers.intVal:
+    let index = opcode.intVal+idx
+    insts.add(
+      quote do:
+        `cpu`.insts[`index`] = `name`
+    )
+
+  result = quote do:
+    proc `name`*(`cpu`: Cpu) =
+      `body`
+
 macro instReg*(name: untyped, base: uint8, count: uint8, body: untyped): untyped =
   let cpu = newIdentNode("cpu")
 

@@ -14,33 +14,10 @@ proc newCpu*(bareMode: bool = false): Cpu =
 
   loadAllInsts result
 
-  result.insts[0x89] = movRm32R32
-  result.insts[0x8a] = movR8Rm8
-  result.insts[0x8b] = movR32Rm32
-  result.insts[0x8c] = movRm16Sr16
-  result.insts[0x8e] = movSr16Rm16
-  result.insts[0x90] = nop
-  result.insts[0x9e] = sahf
-  result.insts[0x9f] = lahf
   for idx in 0..8:
       result.insts[0xb0 + idx] = movR8Imm8
   for idx in 0..8:
       result.insts[0xb8 + idx] = movR32Imm32
-  result.insts[0xc3] = retn
-  result.insts[0xc7] = movRm32Imm32
-  result.insts[0xc9] = leave
-  result.insts[0xcd] = interrupt
-  result.insts[0xe8] = callRelative32
-  result.insts[0xec] = inAlDx
-  result.insts[0xee] = outDxAl
-  result.insts[0xf4] = hlt
-  result.insts[0xf0] = lock
-  result.insts[0xf8] = clc
-  result.insts[0xf9] = stc
-  result.insts[0xfa] = cli
-  result.insts[0xfb] = sti
-  result.insts[0xfc] = cld
-  result.insts[0xfd] = std
 
   result.initBios()
 

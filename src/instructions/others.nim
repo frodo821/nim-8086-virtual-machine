@@ -1,36 +1,37 @@
 import ../bios
 import ../hardware
 import ./jmp
+import ./instmacros
 
 let interruptionTable = initInterruption()
 
-proc callRelative32*(cpu: Cpu) =
+inst callRelative32, 0xe8:
   cpu.push32(cpu.eip + 5)
   cpu.jmpn()
 
-proc retn*(cpu: Cpu) =
+inst retn, 0xc3:
   cpu.eip = cpu.pop32()
 
-proc leave*(cpu: Cpu) =
+inst leave, 0xc9:
   cpu.register.ESP = cpu.register.EBP
   cpu.register.EBP = cpu.pop32()
   cpu.eip += 1
 
-proc inAlDx*(cpu: Cpu) =
+inst inAlDx, 0xec:
   cpu.register.setAL(cpu.readIo8(cpu.register.getDX))
   cpu.eip += 1
 
-proc outDxAl*(cpu: Cpu) =
+inst outDxAl, 0xee:
   cpu.writeIo8(cpu.register.getDX, cpu.register.getAL)
   cpu.eip += 1
 
-proc nop*(cpu: Cpu) =
+inst nop, 0x90:
   cpu.eip += 1
 
-proc hlt*(cpu: Cpu) =
+inst hlt, 0xf4:
   cpu.eip += 1
 
-proc interrupt*(cpu: Cpu) =
+inst interrupt, 0xcd:
   let intr = cpu.getU8(1)
   if not cpu.bareMode:
     let interruption = interruptionTable[intr]
@@ -50,39 +51,39 @@ proc interrupt*(cpu: Cpu) =
   cpu.push32(cpu.eip + 2)
   cpu.eip = address
 
-proc lock*(cpu: Cpu) =
+inst lock, 0xf0:
   # シングルプロセッサなのでlockプレフィクスはNOPとして動作する。
   cpu.eip += 1
 
-proc lahf*(cpu: Cpu) =
+inst lahf, 0x9f:
   cpu.register.setAH(cast[uint8](cpu.eflags and 0x0f))
   cpu.eip += 1
 
-proc sahf*(cpu: Cpu) =
+inst sahf, 0x9e:
   let ah = cpu.register.getAH
   cpu.eflags = (cpu.eflags and 0xffffff00'u32) or ah
   cpu.eip += 1
 
-proc clc*(cpu: Cpu) =
+inst clc, 0xf8:
   cpu.setCarry(false)
   cpu.eip += 1
 
-proc stc*(cpu: Cpu) =
+inst stc, 0xf9:
   cpu.setCarry(true)
   cpu.eip += 1
 
-proc cli*(cpu: Cpu) =
+inst cli, 0xfa:
   cpu.setInterrupt(false)
   cpu.eip += 1
 
-proc sti*(cpu: Cpu) =
+inst sti, 0xfb:
   cpu.setInterrupt(true)
   cpu.eip += 1
 
-proc cld*(cpu: Cpu) =
+inst cld, 0xfc:
   cpu.setDirection(false)
   cpu.eip += 1
 
-proc std*(cpu: Cpu) =
+inst std, 0xfd:
   cpu.setDirection(true)
   cpu.eip += 1

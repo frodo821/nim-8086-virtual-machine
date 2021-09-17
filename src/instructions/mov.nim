@@ -1,7 +1,7 @@
 import ../hardware
 import ./instmacros
 
-variationInsts movR32Imm32, 0xb0, 8:
+instReg movR32Imm32, 0xb8, 8:
   let reg = cpu.getU8(0) - 0xb8
   let val = cpu.getU32(1)
 
@@ -43,8 +43,8 @@ inst movR32Rm32, 0x8b:
   let rm32 = cpu.getRmu32(rm)
   cpu.setR32(rm, rm32)
 
-variationInsts movR8Imm8, 0xb8, 8:
-  cpu.setR8(cpu.getU8(0) - 0xB0, cpu.getU8(1))
+instReg movR8Imm8, 0xb0, 8:
+  cpu.setR8(cpu.getU8(0) - 0xb0, cpu.getU8(1))
   cpu.eip += 2
 
 inst movR8Rm8, 0x8a:

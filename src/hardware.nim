@@ -25,7 +25,7 @@ type
     CS*, DS*, SS* ,ES*, FS*, GS*: uint16
 
   ControlRegisters* = ref object
-    CR0*, CR2*, CR3*, CR4: uint32
+    CR0*, CR1*, CR2*, CR3*, CR4*: uint32
 
   ModRm* = ref object
     `mod`*: uint8
@@ -54,22 +54,22 @@ registerOp8(B)
 
 const CpuFlags* = CpuFlagsInternal(0)
 
-proc CarryFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32
-proc ParityFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 2
-proc AdjustFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 4
-proc ZeroFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 6
-proc SignFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 7
-proc TrapFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 8
-proc InterruptFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 9
-proc DirectionFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 10
-proc OverflowFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 11
-proc IOPL*(flags: CpuFlagsInternal): uint32 {.inline.} = (1'u32 shl 12) or (1'u32 shl 13)
-proc NestTaskFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 14
-proc ResumeFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 16
-proc VirtualMode*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 17
-proc AlignmentCheck*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 18
-proc VirtualInterruptFlag*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 19
-proc VirtualInterruptPending*(flags: CpuFlagsInternal): uint32 {.inline.} = 1'u32 shl 20
+template CarryFlag*(flags: CpuFlagsInternal): uint32 = 1'u32
+template ParityFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 2
+template AdjustFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 4
+template ZeroFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 6
+template SignFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 7
+template TrapFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 8
+template InterruptFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 9
+template DirectionFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 10
+template OverflowFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 11
+template IOPL*(flags: CpuFlagsInternal): uint32 = (1'u32 shl 12) or (1'u32 shl 13)
+template NestTaskFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 14
+template ResumeFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 16
+template VirtualMode*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 17
+template AlignmentCheck*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 18
+template VirtualInterruptFlag*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 19
+template VirtualInterruptPending*(flags: CpuFlagsInternal): uint32 = 1'u32 shl 20
 
 flag carry:
   CpuFlags.CarryFlag
@@ -150,7 +150,7 @@ proc setSr*(cpu: Cpu, index: uint8, val: uint16) =
 proc getCr*(cpu: Cpu, index: uint8): uint32 =
   result = case index
     of 0: cpu.cRegister.CR0
-    # of 1: cpu.cRegister.CR1 unused
+    of 1: cpu.cRegister.CR1 # unused
     of 2: cpu.cRegister.CR2
     of 3: cpu.cRegister.CR3
     of 4: cpu.cRegister.CR4
@@ -160,7 +160,7 @@ proc getCr*(cpu: Cpu, index: uint8): uint32 =
 proc setCr*(cpu: Cpu, index: uint8, val: uint32) =
   case index
     of 0: cpu.cRegister.CR0 = val
-    # of 1: cpu.cRegister.CR1 unused
+    of 1: cpu.cRegister.CR1 = val # unused
     of 2: cpu.cRegister.CR2 = val
     of 3: cpu.cRegister.CR3 = val
     of 4: cpu.cRegister.CR4 = val

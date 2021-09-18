@@ -63,22 +63,13 @@ inst movRm16Sr16, 0x8c:
   let rm = cpu.modRm()
   cpu.setRm16(rm, cpu.getSr(rm.reg))
 
-proc movCr32Rm32*(cpu: Cpu) =
+instWithPrefix movCr32Rm32, 0x0f, 0x22:
   cpu.eip += 1
   let rm = cpu.modRm()
+  echo rm.reg
   cpu.setCr(rm.reg, cpu.getRmu32(rm))
 
-proc movRm32Cr32*(cpu: Cpu) =
+instWithPrefix movRm32Cr32, 0x0f, 0x20:
   cpu.eip += 1
   let rm = cpu.modRm()
   cpu.setRm32(rm, cpu.getCr(rm.reg))
-
-inst op0fh, 0x0f:
-  cpu.eip += 1
-  case cpu.getU8(0)
-  of 0x22:
-    cpu.movCr32Rm32()
-  of 0x20:
-    cpu.movRm32Cr32()
-  else:
-    raise newException(ValueError, "unknown operator")

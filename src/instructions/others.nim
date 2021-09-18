@@ -88,3 +88,5 @@ inst cld, 0xfc:
 inst std, 0xfd:
   cpu.setDirection(true)
   cpu.eip += 1
+
+prefixInst 0x0f

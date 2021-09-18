@@ -44,7 +44,6 @@ proc dumpCpuStat*(cpu: Cpu) =
   pr &= "\nInstruction Counter: " & $cpu.eip & "\n"
   pr &= "Instruction: " & cpu.memory[cpu.eip].toHex() & "\n"
   echo pr
-  echo $cpu.insts
 
 proc run*(cpu: Cpu, start: uint32, program: seq[uint8]) =
   let ran = start..(start + cast[uint32](program.len) - 1)

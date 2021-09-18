@@ -20,37 +20,37 @@ inst jmpn, 0xe9:
 jumpIf jo, 0x70:
   cpu.isOverflow
 
-jumpIfNot jno, 0x71:
+jumpUnless jno, 0x71:
   cpu.isOverflow
 
 jumpIf jc, 0x72:
   cpu.isCarry
 
-jumpIfNot jnc, 0x73:
+jumpUnless jnc, 0x73:
   cpu.isCarry
 
 jumpIf jz, 0x74:
   cpu.isZero
 
-jumpIfNot jnz, 0x75:
+jumpUnless jnz, 0x75:
   cpu.isZero
 
 jumpIf jna, 0x76:
   cpu.isZero or cpu.isCarry
 
-jumpIfNot ja, 0x77:
+jumpUnless ja, 0x77:
   cpu.isZero or cpu.isCarry
 
 jumpIf js, 0x78:
   cpu.isSign
 
-jumpIfNot jns, 0x79:
+jumpUnless jns, 0x79:
   cpu.isSign
 
 jumpIf jp, 0x7a:
   cpu.isParity
 
-jumpIfNot jnp, 0x7b:
+jumpUnless jnp, 0x7b:
   cpu.isParity
 
 jumpIf jl, 0x7c:
